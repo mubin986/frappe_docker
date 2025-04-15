@@ -12,9 +12,22 @@ if [ -f "pwd.yml" ]; then
     echo "Current port configuration:"
     grep -A 2 "ports:" pwd.yml
     
-    # Update the port using a more precise sed command
-    sed -i.bak "/ports:/{n;s/- .*/- \"${PORT}:8080\"/}" pwd.yml
-    rm -f pwd.yml.bak
+    # Create a temporary file
+    TMP_FILE=$(mktemp)
+    
+    # Process the file to update the port
+    awk -v port="$PORT" '
+        /ports:/ { 
+            print $0; 
+            getline; 
+            print "    - \"" port ":8080\""; 
+            next 
+        } 
+        { print $0 }
+    ' pwd.yml > "$TMP_FILE"
+    
+    # Replace the original file
+    mv "$TMP_FILE" pwd.yml
     
     # Verify the change
     echo "New port configuration:"
