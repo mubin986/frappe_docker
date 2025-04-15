@@ -1,0 +1,9 @@
+{
+  "frappe_path": "/Users/mubin/Desktop/custom-erp/frappe_docker",
+  "backup_paths": {
+    "database": "/Users/mubin/Desktop/grippersoft-erp-1/sites/frontend/private/backups/20250414_204332-frontend-database.sql.gz",
+    "public_files": "/Users/mubin/Desktop/grippersoft-erp-1/sites/frontend/private/backups/20250414_204332-frontend-files.tar",
+    "private_files": "/Users/mubin/Desktop/grippersoft-erp-1/sites/frontend/private/backups/20250414_204332-frontend-private-files.tar"
+  },
+  "docker_compose_file": "pwd.yml"
+} 
