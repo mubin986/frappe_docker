@@ -88,3 +88,70 @@ This repository is only for container related stuff. You also might want to cont
 - [Frappe framework](https://github.com/frappe/frappe#contributing),
 - [ERPNext](https://github.com/frappe/erpnext#contributing),
 - [Frappe Bench](https://github.com/frappe/bench).
+
+# Frappe Docker Management CLI
+
+A command-line interface for managing Frappe Docker containers.
+
+## Configuration
+
+The CLI uses a `config.json` file to store configuration. You can create one by copying `config.sample.json` and modifying it, or use the `config` command:
+
+```bash
+./cli.py config --frappe-path /path/to/frappe_docker \
+                --backup-database /path/to/backup/database.sql.gz \
+                --backup-public-files /path/to/backup/public-files.tar \
+                --backup-private-files /path/to/backup/private-files.tar \
+                --docker-compose-file pwd.yml \
+                --platform linux/arm64 \
+                --container-prefix your_prefix
+```
+
+### Configuration Options
+
+- `frappe_path`: Path to your Frappe Docker installation
+- `backup_paths`: Paths to your backup files
+  - `database`: Path to database backup file
+  - `public_files`: Path to public files backup
+  - `private_files`: Path to private files backup
+- `docker_compose_file`: Name of your Docker Compose file (default: pwd.yml)
+- `platform`: Docker platform (linux/arm64 for M1/M2 Macs, linux/amd64 for Intel)
+- `container_names`: Container name prefixes
+  - `backend`: Backend container name prefix
+  - `frontend`: Frontend container name prefix
+
+## Commands
+
+- `config`: Configure paths and settings
+- `build`: Build the Frappe Docker image
+- `run`: Start the Frappe Docker containers
+- `restart`: Restart the Frappe Docker containers
+- `remove`: Remove Frappe Docker containers, volumes, and networks
+- `migrate`: Run database migrations
+- `restore_db`: Restore the database from backup
+- `restore_files`: Restore files from backup
+- `restore_lms`: Install and restore LMS app
+- `restore_hrms`: Install and restore HRMS app
+
+## Usage Examples
+
+```bash
+# Configure the CLI
+./cli.py config --frappe-path /path/to/frappe_docker
+
+# Build and run the containers
+./cli.py build
+./cli.py run
+
+# Restore from backup
+./cli.py restore_db
+./cli.py restore_files
+
+# Install additional apps
+./cli.py restore_lms
+./cli.py restore_hrms
+```
+
+## Development
+
+The CLI is built using Click and Python. Each command corresponds to one of the shell scripts in the directory. The shell scripts use the configuration from `config.json` to determine paths and settings.

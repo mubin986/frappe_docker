@@ -1,10 +1,14 @@
 {
-  "frappe_path": "/path/to/your/frappe_docker",
+  "frappe_path": "/path/to/frappe_docker",
   "backup_paths": {
-    "database": "/path/to/your/backups/database.sql.gz",
-    "public_files": "/path/to/your/backups/public-files.tar",
-    "private_files": "/path/to/your/backups/private-files.tar"
+    "database": "/path/to/backup/database.sql.gz",
+    "public_files": "/path/to/backup/public-files.tar",
+    "private_files": "/path/to/backup/private-files.tar"
   },
   "docker_compose_file": "pwd.yml",
-  "platform": "linux/arm64"
+  "platform": "linux/arm64",
+  "container_names": {
+    "backend": "frappe_docker-backend-1",
+    "frontend": "frappe_docker-frontend-1"
+  }
 } 
