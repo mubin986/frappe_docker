@@ -140,15 +140,11 @@ def build():
     subprocess.run([f"{SCRIPT_DIR}/_build.sh"], shell=True, env=env)
 
 @cli.command()
-@click.option('--port', default=8080, help='Port to run the application on')
-def run(port):
+def run():
     """Start the Frappe Docker containers"""
     config = load_config()
-    click.echo(f"Starting Frappe Docker containers on port {port}...")
-    # Pass the port as an environment variable to ensure it's properly passed to _run.sh
-    env = os.environ.copy()
-    env['PORT'] = str(port)
-    subprocess.run([f"{SCRIPT_DIR}/_run.sh", str(port)], shell=True, env=env)
+    click.echo("Starting Frappe Docker containers...")
+    subprocess.run([f"{SCRIPT_DIR}/_run.sh"], shell=True)
 
 @cli.command()
 def restart():
