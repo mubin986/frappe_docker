@@ -4,10 +4,12 @@ import subprocess
 import os
 from pathlib import Path
 import json
+import yaml
 
 # Get the directory where this script is located
 SCRIPT_DIR = Path(__file__).parent.absolute()
 CONFIG_FILE = SCRIPT_DIR / "config.json"
+PWD_YML = SCRIPT_DIR / "pwd.yml"
 
 def load_config():
     """Load configuration from config.json"""
@@ -21,13 +23,33 @@ def load_config():
             "public_files": "",
             "private_files": ""
         },
-        "docker_compose_file": "pwd.yml"
+        "docker_compose_file": "pwd.yml",
+        "platform": "linux/arm64"  # Default to ARM64 for M1/M2 Macs
     }
 
 def save_config(config):
     """Save configuration to config.json"""
     with open(CONFIG_FILE, 'w') as f:
         json.dump(config, f, indent=2)
+
+def update_pwd_yml(platform):
+    """Update pwd.yml with the specified platform"""
+    if not PWD_YML.exists():
+        click.echo("Error: pwd.yml not found")
+        return False
+    
+    with open(PWD_YML) as f:
+        data = yaml.safe_load(f)
+    
+    # Update platform for all services
+    for service in data.get('services', {}).values():
+        if isinstance(service, dict):
+            service['platform'] = platform
+    
+    with open(PWD_YML, 'w') as f:
+        yaml.dump(data, f, default_flow_style=False)
+    
+    return True
 
 @click.group()
 def cli():
@@ -40,8 +62,9 @@ def cli():
 @click.option('--backup-public-files', help='Path to public files backup')
 @click.option('--backup-private-files', help='Path to private files backup')
 @click.option('--docker-compose-file', help='Docker compose file name')
-def config(frappe_path, backup_database, backup_public_files, backup_private_files, docker_compose_file):
-    """Configure paths for the CLI"""
+@click.option('--platform', type=click.Choice(['linux/arm64', 'linux/amd64']), help='Docker platform (arm64 for M1/M2 Macs, amd64 for Intel)')
+def config(frappe_path, backup_database, backup_public_files, backup_private_files, docker_compose_file, platform):
+    """Configure paths and settings for the CLI"""
     config = load_config()
     
     if frappe_path:
@@ -54,6 +77,11 @@ def config(frappe_path, backup_database, backup_public_files, backup_private_fil
         config['backup_paths']['private_files'] = backup_private_files
     if docker_compose_file:
         config['docker_compose_file'] = docker_compose_file
+    if platform:
+        config['platform'] = platform
+        # Update pwd.yml with the new platform
+        if update_pwd_yml(platform):
+            click.echo(f"Updated pwd.yml with platform {platform}")
     
     save_config(config)
     click.echo("Configuration updated:")
@@ -63,8 +91,10 @@ def config(frappe_path, backup_database, backup_public_files, backup_private_fil
 def build():
     """Build the Frappe Docker image"""
     config = load_config()
-    click.echo("Building Frappe Docker image...")
-    subprocess.run([f"{SCRIPT_DIR}/_build.sh"], shell=True)
+    click.echo(f"Building Frappe Docker image for platform {config['platform']}...")
+    env = os.environ.copy()
+    env['DOCKER_PLATFORM'] = config['platform']
+    subprocess.run([f"{SCRIPT_DIR}/_build.sh"], shell=True, env=env)
 
 @cli.command()
 def run():
