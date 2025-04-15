@@ -9,16 +9,32 @@ echo "Setting port to: $PORT"
 if [ -f "pwd.yml" ]; then
     echo "Updating pwd.yml..."
     
-    # First, clean up any existing port configurations
-    sed -i.bak '/ports:/,+2d' pwd.yml
-    rm -f pwd.yml.bak
+    # Create a temporary file
+    TMP_FILE=$(mktemp)
     
-    # Add the new port configuration
-    sed -i "/frontend:/a \    ports:\n    - \"${PORT}:8080\"" pwd.yml
+    # Process the file to update the port
+    awk -v port="$PORT" '
+        /frontend:/ { 
+            print $0; 
+            print "    ports:";
+            print "    - \"" port ":8080\"";
+            next 
+        }
+        /ports:/ { next }
+        /- "[0-9]*:8080"/ { next }
+        { print $0 }
+    ' pwd.yml > "$TMP_FILE"
+    
+    # Replace the original file
+    mv "$TMP_FILE" pwd.yml
     
     # Verify the change
     echo "New port configuration:"
     grep -A 2 "ports:" pwd.yml
+    
+    # Also verify the full frontend service configuration
+    echo "Full frontend service configuration:"
+    sed -n '/frontend:/,/^  [^ ]/p' pwd.yml
 else
     echo "Error: pwd.yml not found!"
     exit 1
