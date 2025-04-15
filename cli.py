@@ -6,11 +6,13 @@ from pathlib import Path
 import json
 import yaml
 import platform
+import re
 
 # Get the directory where this script is located
 SCRIPT_DIR = Path(__file__).parent.absolute()
 CONFIG_FILE = SCRIPT_DIR / "config.json"
 PWD_YML = SCRIPT_DIR / "pwd.yml"
+BUILD_SH = SCRIPT_DIR / "_build.sh"
 
 def load_config():
     """Load configuration from config.json"""
@@ -49,6 +51,27 @@ def update_pwd_yml(platform):
     
     with open(PWD_YML, 'w') as f:
         yaml.dump(data, f, default_flow_style=False)
+    
+    return True
+
+def update_build_sh(platform):
+    """Update _build.sh with the specified platform"""
+    if not BUILD_SH.exists():
+        click.echo("Error: _build.sh not found")
+        return False
+    
+    with open(BUILD_SH, 'r') as f:
+        content = f.read()
+    
+    # Update the default platform in _build.sh
+    new_content = re.sub(
+        r'PLATFORM=\$\{DOCKER_PLATFORM:-\w+/\w+\}',
+        f'PLATFORM=${{DOCKER_PLATFORM:-{platform}}}',
+        content
+    )
+    
+    with open(BUILD_SH, 'w') as f:
+        f.write(new_content)
     
     return True
 
@@ -97,9 +120,11 @@ def config(frappe_path, backup_database, backup_public_files, backup_private_fil
         config['docker_compose_file'] = docker_compose_file
     if platform:
         config['platform'] = platform
-        # Update pwd.yml with the new platform
+        # Update both pwd.yml and _build.sh with the new platform
         if update_pwd_yml(platform):
             click.echo(f"Updated pwd.yml with platform {platform}")
+        if update_build_sh(platform):
+            click.echo(f"Updated _build.sh with platform {platform}")
     
     save_config(config)
     click.echo("Configuration updated:")
