@@ -2,7 +2,6 @@ services:
   backend:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -20,7 +19,6 @@ services:
   configurator:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -51,7 +49,6 @@ services:
   create-site:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -85,7 +82,6 @@ services:
 
   db:
     image: mariadb:10.6
-    platform: linux/arm64
     networks:
       - frappe_network
     healthcheck:
@@ -109,7 +105,6 @@ services:
   frontend:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     depends_on:
@@ -137,7 +132,6 @@ services:
   queue-long:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -155,7 +149,6 @@ services:
   queue-short:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -172,7 +165,6 @@ services:
 
   redis-queue:
     image: redis:6.2-alpine
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -183,7 +175,6 @@ services:
 
   redis-cache:
     image: redis:6.2-alpine
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -193,7 +184,6 @@ services:
   scheduler:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
@@ -209,7 +199,6 @@ services:
   websocket:
     image: frappe-mubin
     pull_policy: never
-    platform: linux/arm64
     networks:
       - frappe_network
     deploy:
