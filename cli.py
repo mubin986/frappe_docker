@@ -8,6 +8,7 @@ import yaml
 import platform
 import re
 import sys
+import base64
 
 # Get the directory where this script is located
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -144,11 +145,22 @@ def config(frappe_path, backup_database, backup_public_files, backup_private_fil
 @cli.command()
 def build():
     """Build the Frappe Docker image"""
-    config = load_config()
-    click.echo(f"Building Frappe Docker image for platform {config['platform']}...")
-    env = os.environ.copy()
-    env['DOCKER_PLATFORM'] = config['platform']
-    subprocess.run([f"{SCRIPT_DIR}/_build.sh"], shell=True, env=env)
+    try:
+        # Set APPS_JSON_BASE64 environment variable
+        apps_json_path = os.path.join(os.path.dirname(__file__), 'apps.json')
+        if not os.path.exists(apps_json_path):
+            click.echo("Error: apps.json not found", err=True)
+            sys.exit(1)
+            
+        with open(apps_json_path, 'rb') as f:
+            apps_json_content = f.read()
+            os.environ['APPS_JSON_BASE64'] = base64.b64encode(apps_json_content).decode('utf-8').replace('\n', '')
+        
+        click.echo("Building Frappe Docker image...")
+        subprocess.run([f"{SCRIPT_DIR}/_build.sh"], shell=True)
+    except Exception as e:
+        click.echo(f"Error during build: {str(e)}", err=True)
+        sys.exit(1)
 
 @cli.command()
 def run():
