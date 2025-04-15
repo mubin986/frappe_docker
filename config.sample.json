@@ -1,0 +1,10 @@
+{
+  "frappe_path": "/path/to/your/frappe_docker",
+  "backup_paths": {
+    "database": "/path/to/your/backups/database.sql.gz",
+    "public_files": "/path/to/your/backups/public-files.tar",
+    "private_files": "/path/to/your/backups/private-files.tar"
+  },
+  "docker_compose_file": "pwd.yml",
+  "platform": "linux/arm64"
+} 
