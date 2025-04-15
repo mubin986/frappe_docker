@@ -12,14 +12,9 @@ if [ -f "pwd.yml" ]; then
     echo "Current port configuration:"
     grep -A 2 "ports:" pwd.yml
     
-    # Update the port using yq (if available) or sed
-    if command -v yq &> /dev/null; then
-        yq e ".services.frontend.ports[0] = \"${PORT}:8080\"" -i pwd.yml
-    else
-        # Use sed with a more specific pattern
-        sed -i.bak "s|ports:.*|ports:\n    - \"${PORT}:8080\"|" pwd.yml
-        rm -f pwd.yml.bak
-    fi
+    # Update the port using a more precise sed command
+    sed -i.bak "/ports:/{n;s/- .*/- \"${PORT}:8080\"/}" pwd.yml
+    rm -f pwd.yml.bak
     
     # Verify the change
     echo "New port configuration:"
