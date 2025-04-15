@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import json
 import yaml
+import platform
 
 # Get the directory where this script is located
 SCRIPT_DIR = Path(__file__).parent.absolute()
@@ -55,6 +56,23 @@ def update_pwd_yml(platform):
 def cli():
     """Frappe Docker Management CLI"""
     pass
+
+@cli.command()
+def check_platform():
+    """Check system platform and suggest Docker platform"""
+    machine = platform.machine().lower()
+    click.echo(f"System architecture: {machine}")
+    
+    if machine in ['x86_64', 'amd64']:
+        click.echo("Suggested Docker platform: linux/amd64")
+    elif machine in ['aarch64', 'arm64']:
+        click.echo("Suggested Docker platform: linux/arm64")
+    else:
+        click.echo("Unknown architecture. Please check your system manually.")
+    
+    click.echo("\nYou can set the platform using:")
+    click.echo("./cli.py config --platform linux/amd64  # For Intel/AMD processors")
+    click.echo("./cli.py config --platform linux/arm64  # For ARM processors (M1/M2)")
 
 @cli.command()
 @click.option('--frappe-path', help='Path to Frappe installation')
