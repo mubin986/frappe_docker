@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Get port from first argument or use default
-PORT=${1:-8080}
+# Get port from environment variable or first argument or use default
+PORT=${PORT:-${1:-8080}}
 
 echo "Setting port to: $PORT"
 
